@@ -1,4 +1,5 @@
-import { createBrowserRouter, lazy, Suspense } from 'react-router';
+import { lazy, Suspense } from 'react';
+import { createBrowserRouter } from 'react-router';
 import type { RouteObject } from 'react-router';
 import { MainLayout } from '@/layouts/MainLayout';
 import { AuthLayout } from '@/layouts/AuthLayout';
@@ -7,6 +8,7 @@ import { ProtectedRoute } from './ProtectedRoute';
 import { AdminRoute } from './AdminRoute';
 
 const RoleListPage = lazy(() => import('@/features/roles/pages/RoleListPage'));
+const UserListPage = lazy(() => import('@/features/users/pages/UserListPage'));
 
 const routes: RouteObject[] = [
   // Public routes — MainLayout
@@ -78,6 +80,14 @@ const routes: RouteObject[] = [
             element: (
               <Suspense fallback={<div className="p-6 text-gray-400">Loading…</div>}>
                 <RoleListPage />
+              </Suspense>
+            ),
+          },
+          {
+            path: 'users',
+            element: (
+              <Suspense fallback={<div className="p-6 text-gray-400">Loading…</div>}>
+                <UserListPage />
               </Suspense>
             ),
           },

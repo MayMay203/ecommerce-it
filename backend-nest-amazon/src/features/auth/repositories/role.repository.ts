@@ -28,7 +28,8 @@ export class RoleRepository {
   }
 
   async update(id: number, data: Partial<Role>): Promise<Role | null> {
-    await this.repo.update(id, data);
+    const { users: _users, ...updateData } = data;
+    await this.repo.update(id, updateData);
     return this.findById(id);
   }
 

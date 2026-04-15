@@ -15,6 +15,7 @@ export const ROUTES = {
   ADMIN_ORDERS: '/admin/orders',
   ADMIN_CATEGORIES: '/admin/categories',
   ADMIN_ROLES: '/admin/roles',
+  ADMIN_USERS: '/admin/users',
 } as const;
 
 export type RouteValues = (typeof ROUTES)[keyof typeof ROUTES];
