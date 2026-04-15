@@ -30,11 +30,16 @@ A full-featured e-commerce platform inspired by Amazon. This project demonstrate
 - `/be-test [feature]` - Write backend tests (unit + integration)
 - `/fe-test [feature]` - Write frontend tests (component + hook)
 
+### Git Workflow
+- `/git-commit [message?]` - Stage and commit with Conventional Commits standard
+- `/git-resolve-conflict [file?]` - Detect and resolve merge conflicts interactively
+
 ### Skill Routing
 When user asks to:
 - "tạo feature", "add entity", "generate crud" → Use `/be-crud` or `/fe-crud`
 - "viết test", "add tests" → Use `/be-test` or `/fe-test`
 - "init project", "setup structure" → Use `/init-base`
+- "commit", "tạo commit", "save changes" → Use `/git-commit`
 
 ### Important
 - Always read the skill's required docs BEFORE generating code
