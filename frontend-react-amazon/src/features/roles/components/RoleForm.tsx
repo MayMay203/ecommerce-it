@@ -35,11 +35,12 @@ export function RoleForm({ defaultValues, onSubmit, onCancel, isLoading }: Props
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="role-name" className="block text-sm font-medium text-gray-700 mb-1">
           Role Name
         </label>
         <input
           {...register('name')}
+          id="role-name"
           type="text"
           placeholder="e.g. admin, customer"
           className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
