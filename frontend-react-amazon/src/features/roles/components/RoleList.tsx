@@ -61,7 +61,7 @@ export function RoleList({ roles }: Props) {
               <th className="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">
                 Name
               </th>
-              <th className="w-32 px-6 py-3 text-right font-medium text-gray-500 uppercase tracking-wider">
+              <th className="w-40 px-6 py-3 text-right font-medium text-gray-500 uppercase tracking-wider">
                 Actions
               </th>
             </tr>
@@ -78,7 +78,7 @@ export function RoleList({ roles }: Props) {
                 <tr key={role.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 text-gray-500">{role.id}</td>
                   <td className="px-6 py-4 font-medium text-gray-900">{role.name}</td>
-                  <td className="px-6 py-4 text-right space-x-2">
+                  <td className="px-6 py-4 text-right whitespace-nowrap space-x-2">
                     <button
                       onClick={() => setModal({ mode: 'edit', role })}
                       className="rounded px-3 py-1 text-xs font-medium text-blue-600 border border-blue-200 hover:bg-blue-50"

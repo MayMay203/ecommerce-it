@@ -16,7 +16,10 @@ async function bootstrap() {
   const reflector = app.get(Reflector);
 
   app.setGlobalPrefix('api/v1');
-  app.enableCors();
+  app.enableCors({
+    origin: config.get<string>('app.corsOrigin'),
+    credentials: true,
+  });
 
   app.useGlobalPipes(globalValidationPipe);
   app.useGlobalFilters(new HttpExceptionFilter());

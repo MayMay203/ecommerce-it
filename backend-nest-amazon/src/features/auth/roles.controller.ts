@@ -11,6 +11,7 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
+import { Public } from '../../shared/decorators/public.decorator';
 import { Roles } from '../../shared/decorators/roles.decorator';
 import { JwtAuthGuard } from '../../shared/guards/jwt-auth.guard';
 import { RolesGuard } from '../../shared/guards/roles.guard';
@@ -25,12 +26,14 @@ export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
 
   @Get()
+  @Public()
   async findAll() {
     const data = await this.rolesService.findAll();
     return { data, message: 'Roles retrieved successfully' };
   }
 
   @Get(':id')
+  @Public()
   async findOne(@Param('id', ParseIntPipe) id: number) {
     const data = await this.rolesService.findOne(id);
     return { data, message: 'Role retrieved successfully' };
