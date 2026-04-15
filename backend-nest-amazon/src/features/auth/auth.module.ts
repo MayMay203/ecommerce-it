@@ -3,8 +3,12 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule, JwtModuleOptions } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthController } from './auth.controller';
+import { AuthService } from './auth.service';
+import { RefreshToken } from './entities/refresh-token.entity';
 import { Role } from './entities/role.entity';
 import { User } from './entities/user.entity';
+import { RefreshTokenRepository } from './repositories/refresh-token.repository';
 import { RoleRepository } from './repositories/role.repository';
 import { UserRepository } from './repositories/user.repository';
 import { RolesController } from './roles.controller';
@@ -15,7 +19,7 @@ import { UsersService } from './users.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Role, User]),
+    TypeOrmModule.forFeature([Role, User, RefreshToken]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -24,8 +28,16 @@ import { UsersService } from './users.service';
         config.get<JwtModuleOptions>('jwt') ?? {},
     }),
   ],
-  controllers: [RolesController, UsersController],
-  providers: [RolesService, RoleRepository, UsersService, UserRepository, JwtStrategy],
-  exports: [RolesService, RoleRepository, UsersService, UserRepository, JwtModule],
+  controllers: [AuthController, RolesController, UsersController],
+  providers: [
+    AuthService,
+    RolesService,
+    RoleRepository,
+    UsersService,
+    UserRepository,
+    RefreshTokenRepository,
+    JwtStrategy,
+  ],
+  exports: [AuthService, RolesService, RoleRepository, UsersService, UserRepository, JwtModule],
 })
 export class AuthModule {}

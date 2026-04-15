@@ -7,6 +7,8 @@ import { AdminLayout } from '@/layouts/AdminLayout';
 import { ProtectedRoute } from './ProtectedRoute';
 import { AdminRoute } from './AdminRoute';
 
+const LoginPage = lazy(() => import('@/features/auth/pages/LoginPage'));
+const RegisterPage = lazy(() => import('@/features/auth/pages/RegisterPage'));
 const RoleListPage = lazy(() => import('@/features/roles/pages/RoleListPage'));
 const UserListPage = lazy(() => import('@/features/users/pages/UserListPage'));
 
@@ -40,8 +42,22 @@ const routes: RouteObject[] = [
     path: '/',
     element: <AuthLayout />,
     children: [
-      { path: 'login', element: <div>Login Page — coming soon</div> },
-      { path: 'register', element: <div>Register Page — coming soon</div> },
+      {
+        path: 'login',
+        element: (
+          <Suspense fallback={<div className="p-6 text-gray-400">Loading…</div>}>
+            <LoginPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'register',
+        element: (
+          <Suspense fallback={<div className="p-6 text-gray-400">Loading…</div>}>
+            <RegisterPage />
+          </Suspense>
+        ),
+      },
     ],
   },
 

@@ -25,6 +25,10 @@ export class UserRepository {
     return this.repo.findOneBy({ email });
   }
 
+  findByEmailWithRole(email: string): Promise<User | null> {
+    return this.repo.findOne({ where: { email }, relations: ['role'] });
+  }
+
   create(data: Partial<User>): Promise<User> {
     const user = this.repo.create(data);
     return this.repo.save(user);
