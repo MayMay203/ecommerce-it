@@ -47,7 +47,31 @@ Read and understand:
 - DTOs (validation to test)
 - Repository queries (if complex)
 
-### Step 2: Generate Test Files
+### Step 2: Summary & Confirmation (REQUIRED — do NOT skip)
+
+Before writing any file, present the full plan and **wait for user confirmation**.
+
+Output format:
+```
+📋 Test plan for feature "{feature-name}"
+
+📁 Files to be CREATED:
+- src/features/{feature-name}/tests/{feature}.service.spec.ts
+- src/features/{feature-name}/tests/{feature}.controller.spec.ts
+- src/features/{feature-name}/tests/{feature}.e2e.spec.ts  (if applicable)
+
+⚠️  {N} test files will be created.
+
+Proceed? (yes / no / adjust)
+```
+
+**Rules:**
+- Do NOT create or edit any file before the user replies "yes" (or equivalent affirmative)
+- If user says "no" → stop and ask what to change
+- If user says "adjust" / requests changes → update the plan and show it again
+- Only after explicit approval → proceed to Step 3
+
+### Step 3: Generate Test Files
 
 ```
 src/features/{feature-name}/tests/
@@ -56,7 +80,7 @@ src/features/{feature-name}/tests/
 └── {feature}.e2e.spec.ts          # Integration/E2E tests (optional)
 ```
 
-### Step 3: Write Service Tests
+### Step 4: Write Service Tests
 
 **Structure:**
 ```typescript
@@ -94,7 +118,7 @@ describe('{Feature}Service', () => {
 - Test edge cases (empty, null, invalid)
 - Use beforeEach for setup
 
-### Step 4: Write Controller Tests
+### Step 5: Write Controller Tests
 
 **Structure:**
 ```typescript
@@ -124,7 +148,7 @@ describe('{Feature}Controller', () => {
 - Test response structure
 - Test validation errors
 
-### Step 5: Write E2E Tests (Optional)
+### Step 6: Write E2E Tests (Optional)
 
 For critical features, add integration tests:
 - Test full request → database flow

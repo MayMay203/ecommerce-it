@@ -54,7 +54,48 @@ Ask user (if not clear from context):
 - Check shared components available
 - Follow the same patterns exactly
 
-### Step 3: Generate Files
+### Step 3: Summary & Confirmation (REQUIRED — do NOT skip)
+
+Before writing any file, present the full plan and **wait for user confirmation**.
+
+Output format:
+```
+📋 Plan for feature "{feature-name}"
+
+📁 Files to be CREATED:
+- src/features/{feature-name}/index.ts
+- src/features/{feature-name}/types/{feature}.types.ts
+- src/features/{feature-name}/services/{feature}.service.ts
+- src/features/{feature-name}/hooks/use{Feature}s.ts
+- src/features/{feature-name}/hooks/use{Feature}.ts
+- src/features/{feature-name}/hooks/useCreate{Feature}.ts
+- src/features/{feature-name}/hooks/useUpdate{Feature}.ts
+- src/features/{feature-name}/hooks/useDelete{Feature}.ts
+- src/features/{feature-name}/components/{Feature}List.tsx
+- src/features/{feature-name}/components/{Feature}Card.tsx
+- src/features/{feature-name}/components/{Feature}Form.tsx
+- src/features/{feature-name}/components/{Feature}Detail.tsx
+- src/features/{feature-name}/pages/{Feature}ListPage.tsx
+- src/features/{feature-name}/pages/{Feature}DetailPage.tsx
+- src/features/{feature-name}/pages/{Feature}CreatePage.tsx  (if applicable)
+- src/features/{feature-name}/pages/{Feature}EditPage.tsx    (if applicable)
+
+📝 Files to be UPDATED:
+- src/routes/routes.ts   → add route constants
+- src/routes/index.tsx   → add route entries
+
+⚠️  {N} files will be created, {M} files will be updated.
+
+Proceed? (yes / no / adjust)
+```
+
+**Rules:**
+- Do NOT create or edit any file before the user replies "yes" (or equivalent affirmative)
+- If user says "no" → stop and ask what to change
+- If user says "adjust" / requests changes → update the plan and show it again
+- Only after explicit approval → proceed to Step 4
+
+### Step 4: Generate Files
 
 Create in order:
 
@@ -84,7 +125,7 @@ src/features/{feature-name}/
     └── {feature}.types.ts           # TypeScript types
 ```
 
-### Step 4: Implement Each Layer
+### Step 5: Implement Each Layer
 
 **Types:** Match API_SPEC.md response
 ```typescript
@@ -126,7 +167,7 @@ export const useProducts = (params) => {
 - Handle routing params
 - Minimal logic (delegate to components)
 
-### Step 5: Add Routes
+### Step 6: Add Routes
 
 Update `src/routes/`:
 - Add route constants to `routes.ts`

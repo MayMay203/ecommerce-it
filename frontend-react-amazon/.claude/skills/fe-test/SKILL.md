@@ -47,7 +47,33 @@ Read and understand:
 - Pages (integration of components)
 - User interactions (clicks, forms)
 
-### Step 2: Generate Test Files
+### Step 2: Summary & Confirmation (REQUIRED — do NOT skip)
+
+Before writing any file, present the full plan and **wait for user confirmation**.
+
+Output format:
+```
+📋 Test plan for feature "{feature-name}"
+
+📁 Files to be CREATED:
+- src/features/{feature-name}/components/{Feature}List.test.tsx
+- src/features/{feature-name}/components/{Feature}Form.test.tsx
+- src/features/{feature-name}/hooks/use{Feature}s.test.ts
+- src/features/{feature-name}/hooks/useCreate{Feature}.test.ts
+- src/features/{feature-name}/pages/{Feature}ListPage.test.tsx  (if applicable)
+
+⚠️  {N} test files will be created.
+
+Proceed? (yes / no / adjust)
+```
+
+**Rules:**
+- Do NOT create or edit any file before the user replies "yes" (or equivalent affirmative)
+- If user says "no" → stop and ask what to change
+- If user says "adjust" / requests changes → update the plan and show it again
+- Only after explicit approval → proceed to Step 3
+
+### Step 3: Generate Test Files
 
 ```
 src/features/{feature-name}/
@@ -65,7 +91,7 @@ src/features/{feature-name}/
     └── {Feature}ListPage.test.tsx    # Page test (integration)
 ```
 
-### Step 3: Write Component Tests
+### Step 4: Write Component Tests
 
 **Structure:**
 ```typescript
@@ -91,7 +117,7 @@ describe('{Feature}Form', () => {
 - Mock hooks with jest.mock()
 - Use `screen.getByRole`, `getByText`
 
-### Step 4: Write Hook Tests
+### Step 5: Write Hook Tests
 
 **Structure:**
 ```typescript
@@ -116,7 +142,7 @@ describe('useCreate{Feature}', () => {
 - Test loading → success flow
 - Test error handling
 
-### Step 5: Write Page Tests (Integration)
+### Step 6: Write Page Tests (Integration)
 
 **Structure:**
 ```typescript

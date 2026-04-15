@@ -55,7 +55,41 @@ Ask user (if not clear from context):
 - Check how other features structure their files
 - Follow the same patterns exactly
 
-### Step 3: Generate Files
+### Step 3: Summary & Confirmation (REQUIRED — do NOT skip)
+
+Before writing any file, present the full plan and **wait for user confirmation**.
+
+Output format:
+```
+📋 Plan for feature "{feature-name}"
+
+📁 Files to be CREATED:
+- src/features/{feature-name}/{feature}.module.ts
+- src/features/{feature-name}/{feature}.controller.ts
+- src/features/{feature-name}/{feature}.service.ts
+- src/features/{feature-name}/repositories/{entity}.repository.ts
+- src/features/{feature-name}/entities/{entity}.entity.ts
+- src/features/{feature-name}/dto/create-{entity}.dto.ts
+- src/features/{feature-name}/dto/update-{entity}.dto.ts
+- src/features/{feature-name}/dto/query-{entity}.dto.ts  (if applicable)
+- src/features/{feature-name}/types/{feature}.types.ts   (if applicable)
+- src/features/{feature-name}/CONTEXT.md
+
+📝 Files to be UPDATED:
+- src/app.module.ts  → add {FeatureName}Module to imports
+
+⚠️  {N} files will be created, {M} files will be updated.
+
+Proceed? (yes / no / adjust)
+```
+
+**Rules:**
+- Do NOT create or edit any file before the user replies "yes" (or equivalent affirmative)
+- If user says "no" → stop and ask what to change
+- If user says "adjust" / requests changes → update the plan and show it again
+- Only after explicit approval → proceed to Step 4
+
+### Step 4: Generate Files
 
 Create in order:
 
@@ -77,7 +111,7 @@ src/features/{feature-name}/
 └── CONTEXT.md (brief feature documentation)
 ```
 
-### Step 4: Implement Each File
+### Step 5: Implement Each File
 
 **Entity:** Follow DATABASE.md schema exactly
 - Use TypeORM decorators
@@ -104,7 +138,7 @@ src/features/{feature-name}/
 - Import dependencies
 - Export if needed by other features
 
-### Step 5: Register Module
+### Step 6: Register Module
 
 Update `app.module.ts`:
 - Import new feature module
