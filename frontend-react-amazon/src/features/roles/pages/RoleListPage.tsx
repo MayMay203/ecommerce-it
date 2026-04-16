@@ -22,8 +22,8 @@ export default function RoleListPage() {
   }
 
   return (
-    <div>
-      <div className="mb-6">
+    <div className="h-full flex flex-col gap-4">
+      <div className="flex-shrink-0">
         <h1 className="text-2xl font-bold text-gray-900">Roles</h1>
         <p className="mt-1 text-sm text-gray-500">Manage user roles for the platform.</p>
       </div>
