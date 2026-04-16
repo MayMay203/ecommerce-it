@@ -11,6 +11,7 @@ const LoginPage = lazy(() => import('@/features/auth/pages/LoginPage'));
 const RegisterPage = lazy(() => import('@/features/auth/pages/RegisterPage'));
 const RoleListPage = lazy(() => import('@/features/roles/pages/RoleListPage'));
 const UserListPage = lazy(() => import('@/features/users/pages/UserListPage'));
+const CategoryListPage = lazy(() => import('@/features/categories/pages/CategoryListPage'));
 
 const routes: RouteObject[] = [
   // Public routes — MainLayout
@@ -90,7 +91,14 @@ const routes: RouteObject[] = [
         children: [
           { path: 'products', element: <div>Admin Products — coming soon</div> },
           { path: 'orders', element: <div>Admin Orders — coming soon</div> },
-          { path: 'categories', element: <div>Admin Categories — coming soon</div> },
+          {
+            path: 'categories',
+            element: (
+              <Suspense fallback={<div className="p-6 text-gray-400">Loading…</div>}>
+                <CategoryListPage />
+              </Suspense>
+            ),
+          },
           {
             path: 'roles',
             element: (
