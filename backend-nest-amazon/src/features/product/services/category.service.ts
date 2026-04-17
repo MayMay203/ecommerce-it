@@ -64,20 +64,20 @@ export class CategoryService {
 
     if (dto.name) {
       const existing = await this.categoryRepository.findByName(dto.name);
-      if (existing && existing.id !== id) {
+      if (existing && Number(existing.id) !== id) {
         throw new ConflictException(`Category name "${dto.name}" already exists`);
       }
     }
 
     if (dto.slug) {
       const existing = await this.categoryRepository.findBySlug(dto.slug);
-      if (existing && existing.id !== id) {
+      if (existing && Number(existing.id) !== id) {
         throw new ConflictException(`Category slug "${dto.slug}" already exists`);
       }
     }
 
     if (dto.parentId) {
-      if (dto.parentId === id) {
+      if (Number(dto.parentId) === id) {
         throw new BadRequestException('A category cannot be its own parent');
       }
       const parent = await this.categoryRepository.findById(dto.parentId);

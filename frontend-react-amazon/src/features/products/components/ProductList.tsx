@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import type { Category } from '@/features/categories/types/category.types';
 import { Pagination } from '@/shared/components/ui/Pagination';
+import { ConfirmModal } from '@/shared/components/ui/ConfirmModal';
+import { AlertModal } from '@/shared/components/ui/AlertModal';
 import type { Product } from '../types/product.types';
 import { ProductForm } from './ProductForm';
 import { ProductVariantList } from './ProductVariantList';
@@ -14,6 +16,7 @@ interface Props {
 }
 
 type ModalState = { mode: 'create' } | { mode: 'edit'; product: Product };
+type ConfirmDelete = { id: number; name: string };
 
 const PAGE_SIZE = 10;
 
@@ -50,11 +53,10 @@ function ProductRow({ product, deletingId, onEdit, onDelete, onManageVariants }:
       </td>
       <td className="px-4 py-3 text-sm">
         <span
-          className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
-            product.isActive
-              ? 'bg-green-100 text-green-700'
-              : 'bg-gray-100 text-gray-500'
-          }`}
+          className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${product.isActive
+            ? 'bg-green-100 text-green-700'
+            : 'bg-gray-100 text-gray-500'
+            }`}
         >
           {product.isActive ? 'Active' : 'Inactive'}
         </span>
@@ -89,6 +91,8 @@ export function ProductList({ products, categories }: Props) {
   const [modal, setModal] = useState<ModalState | null>(null);
   const [variantsProduct, setVariantsProduct] = useState<Product | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<ConfirmDelete | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
 
   const createProduct = useCreateProduct();
@@ -109,9 +113,24 @@ export function ProductList({ products, categories }: Props) {
   }
 
   function handleDelete(id: number) {
-    if (!window.confirm('Delete this product? It will be marked as inactive.')) return;
+    const product = products.find((p) => p.id === id);
+    setConfirmDelete({ id, name: product?.name ?? `#${id}` });
+  }
+
+  function confirmDeleteAction() {
+    if (!confirmDelete) return;
+    const { id } = confirmDelete;
+    setConfirmDelete(null);
     setDeletingId(id);
-    deleteProduct.mutate(id, { onSettled: () => setDeletingId(null) });
+    deleteProduct.mutate(id, {
+      onSettled: () => setDeletingId(null),
+      onError: (err: unknown) => {
+        const msg =
+          (err as { response?: { error?: { message?: string } } })?.response?.error?.message ??
+          'Failed to delete product. Please try again.';
+        setDeleteError(msg);
+      },
+    });
   }
 
   const isMutating = createProduct.isPending || updateProduct.isPending;
@@ -202,6 +221,24 @@ export function ProductList({ products, categories }: Props) {
             />
           </div>
         </div>
+      )}
+
+      {confirmDelete && (
+        <ConfirmModal
+          title="Delete Category"
+          message={`Are you sure you want to delete "${confirmDelete.name}"? This action cannot be undone.`}
+          confirmLabel="Delete"
+          onConfirm={confirmDeleteAction}
+          onCancel={() => setConfirmDelete(null)}
+        />
+      )}
+
+      {deleteError && (
+        <AlertModal
+          title="Delete Failed"
+          message={deleteError}
+          onClose={() => setDeleteError(null)}
+        />
       )}
 
       {/* Variant management modal */}

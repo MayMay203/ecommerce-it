@@ -5,12 +5,15 @@ import { useCreateCategory } from '../hooks/useCreateCategory';
 import { useUpdateCategory } from '../hooks/useUpdateCategory';
 import { useDeleteCategory } from '../hooks/useDeleteCategory';
 import { Pagination } from '@/shared/components/ui/Pagination';
+import { ConfirmModal } from '@/shared/components/ui/ConfirmModal';
+import { AlertModal } from '@/shared/components/ui/AlertModal';
 
 interface Props {
   categories: Category[];
 }
 
 type ModalState = { mode: 'create' } | { mode: 'edit'; category: Category };
+type ConfirmDelete = { id: number; name: string };
 
 const PAGE_SIZE = 10;
 
@@ -26,7 +29,6 @@ function flattenForParentOptions(categories: Category[]): Category[] {
   return result;
 }
 
-// Flatten tree into rows with depth info for pagination
 interface FlatRow {
   category: Category;
   isChild: boolean;
@@ -96,6 +98,8 @@ function CategoryRow({ category, isChild, deletingId, onEdit, onDelete }: RowPro
 export function CategoryList({ categories }: Props) {
   const [modal, setModal] = useState<ModalState | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<ConfirmDelete | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
 
   const createCategory = useCreateCategory();
@@ -118,9 +122,25 @@ export function CategoryList({ categories }: Props) {
   }
 
   function handleDelete(id: number) {
-    if (!window.confirm('Delete this category? This action cannot be undone.')) return;
+    const cat = allFlat.find((c) => c.id === id);
+    setConfirmDelete({ id, name: cat?.name ?? `#${id}` });
+  }
+
+  function confirmDeleteAction() {
+    if (!confirmDelete) return;
+    const { id } = confirmDelete;
+    setConfirmDelete(null);
     setDeletingId(id);
-    deleteCategory.mutate(id, { onSettled: () => setDeletingId(null) });
+    deleteCategory.mutate(id, {
+      onSettled: () => setDeletingId(null),
+      onError: (err: unknown) => {
+        console.log('error', err)
+        const msg =
+          (err as { response?: { error?: { message?: string } } })?.response?.error?.message ??
+          'Failed to delete category. Please try again.';
+        setDeleteError(msg);
+      },
+    });
   }
 
   const isMutating = createCategory.isPending || updateCategory.isPending;
@@ -188,7 +208,7 @@ export function CategoryList({ categories }: Props) {
         </div>
       </div>
 
-      {/* Modal */}
+      {/* Create / Edit modal */}
       {modal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
@@ -204,6 +224,24 @@ export function CategoryList({ categories }: Props) {
             />
           </div>
         </div>
+      )}
+
+      {confirmDelete && (
+        <ConfirmModal
+          title="Delete Category"
+          message={`Are you sure you want to delete "${confirmDelete.name}"? This action cannot be undone.`}
+          confirmLabel="Delete"
+          onConfirm={confirmDeleteAction}
+          onCancel={() => setConfirmDelete(null)}
+        />
+      )}
+
+      {deleteError && (
+        <AlertModal
+          title="Delete Failed"
+          message={deleteError}
+          onClose={() => setDeleteError(null)}
+        />
       )}
     </div>
   );
