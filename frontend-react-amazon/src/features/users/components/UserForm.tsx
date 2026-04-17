@@ -76,7 +76,7 @@ export function UserForm({ defaultValues, onSubmit, onCancel, isLoading }: Props
   const errorClass = 'mt-1 text-xs text-red-500';
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
       {/* Email — create only */}
       {!isEditing && (
         <div>

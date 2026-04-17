@@ -59,10 +59,10 @@ describe('LoginForm', () => {
     await user.type(screen.getByLabelText(/password/i), 'password123');
     await user.click(screen.getByRole('button', { name: /sign in/i }));
 
-    expect(mockOnSubmit).toHaveBeenCalledWith({
-      email: 'alice@example.com',
-      password: 'password123',
-    });
+    expect(mockOnSubmit).toHaveBeenCalledWith(
+      { email: 'alice@example.com', password: 'password123' },
+      expect.anything(),
+    );
   });
 
   it('disables submit button and shows loading text when isLoading is true', () => {

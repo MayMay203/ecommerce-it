@@ -10,7 +10,13 @@ export default function LoginPage() {
 
   async function handleSubmit(data: LoginRequest) {
     login.mutate(data, {
-      onSuccess: () => navigate(ROUTES.HOME, { replace: true }),
+      onSuccess: (res) => {
+        const role = res.data.user.role;
+        const dest = role === 'admin' || role === 'moderator'
+          ? ROUTES.ADMIN_PRODUCTS
+          : ROUTES.HOME;
+        navigate(dest, { replace: true });
+      },
     });
   }
 

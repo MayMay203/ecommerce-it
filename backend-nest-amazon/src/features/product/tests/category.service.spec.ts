@@ -245,8 +245,10 @@ describe('CategoryService', () => {
       // Arrange
       const dto = { parentId: 99 };
       mockCategoryRepository.findById
-        .mockResolvedValueOnce(categoryStub({ id: 1 })) // findOne(id)
-        .mockResolvedValueOnce(null); // findById(parentId)
+        .mockResolvedValueOnce(categoryStub({ id: 1 })) // findOne(id) — 1st call
+        .mockResolvedValueOnce(null)                    // findById(parentId) — 1st call
+        .mockResolvedValueOnce(categoryStub({ id: 1 })) // findOne(id) — 2nd call
+        .mockResolvedValueOnce(null);                   // findById(parentId) — 2nd call
 
       // Act & Assert
       await expect(service.update(1, dto)).rejects.toThrow(NotFoundException);
