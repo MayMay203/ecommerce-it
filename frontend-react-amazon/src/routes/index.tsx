@@ -12,7 +12,9 @@ const RegisterPage = lazy(() => import('@/features/auth/pages/RegisterPage'));
 const RoleListPage = lazy(() => import('@/features/roles/pages/RoleListPage'));
 const UserListPage = lazy(() => import('@/features/users/pages/UserListPage'));
 const CategoryListPage = lazy(() => import('@/features/categories/pages/CategoryListPage'));
-const ProductListPage = lazy(() => import('@/features/products/pages/ProductListPage'));
+const AdminProductListPage = lazy(() => import('@/features/products/pages/ProductListPage'));
+const UserProductListPage = lazy(() => import('@/features/product/pages/ProductListPage'));
+const UserProductDetailPage = lazy(() => import('@/features/product/pages/ProductDetailPage'));
 
 const routes: RouteObject[] = [
   // Public routes — MainLayout
