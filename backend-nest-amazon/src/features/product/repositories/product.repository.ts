@@ -31,8 +31,22 @@ export class ProductRepository {
     });
   }
 
+  findBySlugExcluding(slug: string, excludeId: number): Promise<Product | null> {
+    return this.repo
+      .createQueryBuilder('product')
+      .where('product.slug = :slug AND product.id != :excludeId', { slug, excludeId })
+      .getOne();
+  }
+
   findByName(name: string): Promise<Product | null> {
     return this.repo.findOneBy({ name });
+  }
+
+  findByNameExcluding(name: string, excludeId: number): Promise<Product | null> {
+    return this.repo
+      .createQueryBuilder('product')
+      .where('product.name = :name AND product.id != :excludeId', { name, excludeId })
+      .getOne();
   }
 
   create(data: Partial<Product>): Promise<Product> {

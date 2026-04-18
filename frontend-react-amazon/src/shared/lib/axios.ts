@@ -31,6 +31,13 @@ api.interceptors.response.use(
   (res) => res,
   async (err) => {
     const originalRequest = err.config;
+
+    // Never retry the refresh endpoint itself — prevents infinite loop.
+    // Let useInitAuth handle refresh failures gracefully.
+    if (originalRequest.url?.includes('/auth/refresh')) {
+      return Promise.reject(err);
+    }
+
     if (err.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {

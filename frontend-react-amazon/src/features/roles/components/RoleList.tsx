@@ -5,6 +5,7 @@ import { useCreateRole } from '../hooks/useCreateRole';
 import { useUpdateRole } from '../hooks/useUpdateRole';
 import { useDeleteRole } from '../hooks/useDeleteRole';
 import { Pagination } from '@/shared/components/ui/Pagination';
+import { ConfirmModal } from '@/shared/components/ui/ConfirmModal';
 
 interface Props {
   roles: Role[];
@@ -17,6 +18,7 @@ const PAGE_SIZE = 10;
 export function RoleList({ roles }: Props) {
   const [modal, setModal] = useState<ModalState | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
   const [page, setPage] = useState(1);
 
   const createRole = useCreateRole();
@@ -35,9 +37,14 @@ export function RoleList({ roles }: Props) {
   }
 
   function handleDelete(id: number) {
-    if (!window.confirm('Delete this role? This action cannot be undone.')) return;
-    setDeletingId(id);
-    deleteRole.mutate(id, { onSettled: () => setDeletingId(null) });
+    setConfirmDeleteId(id);
+  }
+
+  function confirmDelete() {
+    if (confirmDeleteId === null) return;
+    setDeletingId(confirmDeleteId);
+    setConfirmDeleteId(null);
+    deleteRole.mutate(confirmDeleteId, { onSettled: () => setDeletingId(null) });
   }
 
   const isMutating = createRole.isPending || updateRole.isPending;
@@ -117,7 +124,7 @@ export function RoleList({ roles }: Props) {
         </div>
       </div>
 
-      {/* Modal */}
+      {/* Form Modal */}
       {modal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
@@ -132,6 +139,17 @@ export function RoleList({ roles }: Props) {
             />
           </div>
         </div>
+      )}
+
+      {/* Confirm Delete Modal */}
+      {confirmDeleteId !== null && (
+        <ConfirmModal
+          title="Delete Role"
+          message="Are you sure you want to delete this role? This action cannot be undone."
+          confirmLabel="Delete"
+          onConfirm={confirmDelete}
+          onCancel={() => setConfirmDeleteId(null)}
+        />
       )}
     </div>
   );

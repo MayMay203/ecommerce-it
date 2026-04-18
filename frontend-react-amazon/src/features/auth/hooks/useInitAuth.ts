@@ -13,11 +13,14 @@ export function useInitAuth() {
 
     async function init() {
       try {
-        // Try to get a fresh access token via the httpOnly refresh cookie
         const refreshRes = await authService.refresh();
-        const token = refreshRes.data.accessToken;
 
-        if (!token || cancelled) {
+        // Bail immediately if this effect run was cleaned up (React StrictMode
+        // runs effects twice; the first run gets cancelled before it resolves).
+        if (cancelled) return;
+
+        const token = refreshRes.data.accessToken;
+        if (!token) {
           clear();
           setIsReady(true);
           return;
@@ -25,21 +28,24 @@ export function useInitAuth() {
 
         setAccessToken(token);
 
-        // Fetch the current user with the fresh token
         const meRes = await authService.getMe();
-        if (!cancelled) {
-          const raw = meRes.data as unknown as Record<string, unknown>;
-          const roleRaw = raw.role as { name?: string } | string | undefined;
-          setUser({
-            id: raw.id as number,
-            email: raw.email as string,
-            firstName: raw.firstName as string,
-            lastName: raw.lastName as string,
-            role: typeof roleRaw === 'string' ? roleRaw : (roleRaw?.name ?? 'customer'),
-          });
-        }
+
+        if (cancelled) return;
+
+        const raw = meRes.data as unknown as Record<string, unknown>;
+        const roleRaw = raw.role as { name?: string } | string | undefined;
+        setUser({
+          id: raw.id as number,
+          email: raw.email as string,
+          firstName: raw.firstName as string,
+          lastName: raw.lastName as string,
+          role: typeof roleRaw === 'string' ? roleRaw : (roleRaw?.name ?? 'customer'),
+        });
       } catch {
-        if (!cancelled) clear();
+        if (!cancelled) {
+          setAccessToken(null);
+          clear();
+        }
       } finally {
         if (!cancelled) setIsReady(true);
       }

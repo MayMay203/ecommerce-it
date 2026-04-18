@@ -4,6 +4,9 @@ import { ProductVariantForm } from './ProductVariantForm';
 import { useCreateProductVariant } from '../hooks/useCreateProductVariant';
 import { useUpdateProductVariant } from '../hooks/useUpdateProductVariant';
 import { useDeleteProductVariant } from '../hooks/useDeleteProductVariant';
+import { ConfirmModal } from '@/shared/components/ui/ConfirmModal';
+import { AlertModal } from '@/shared/components/ui/AlertModal';
+import { getApiErrorMessage } from '@/shared/utils/error.utils';
 
 interface Props {
   productId: number;
@@ -11,6 +14,7 @@ interface Props {
 }
 
 type ModalState = { mode: 'create' } | { mode: 'edit'; variant: ProductVariant };
+type ConfirmDeleteState = { id: number; sku: string };
 
 function formatPrice(value: number): string {
   return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
@@ -19,6 +23,8 @@ function formatPrice(value: number): string {
 export function ProductVariantList({ productId, variants }: Props) {
   const [modal, setModal] = useState<ModalState | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<ConfirmDeleteState | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const createVariant = useCreateProductVariant(productId);
   const updateVariant = useUpdateProductVariant();
@@ -26,19 +32,38 @@ export function ProductVariantList({ productId, variants }: Props) {
 
   function handleSubmit(data: Parameters<typeof createVariant.mutate>[0]) {
     if (modal?.mode === 'create') {
-      createVariant.mutate(data, { onSuccess: () => setModal(null) });
+      createVariant.mutate(data, {
+        onSuccess: () => setModal(null),
+        onError: (err) =>
+          setErrorMessage(getApiErrorMessage(err, 'Failed to create variant. Please try again.')),
+      });
     } else if (modal?.mode === 'edit') {
       updateVariant.mutate(
         { id: modal.variant.id, data },
-        { onSuccess: () => setModal(null) },
+        {
+          onSuccess: () => setModal(null),
+          onError: (err) =>
+            setErrorMessage(getApiErrorMessage(err, 'Failed to update variant. Please try again.')),
+        },
       );
     }
   }
 
   function handleDelete(id: number) {
-    if (!window.confirm('Delete this variant? This cannot be undone.')) return;
+    const variant = variants.find((v) => v.id === id);
+    setConfirmDelete({ id, sku: variant?.sku ?? `#${id}` });
+  }
+
+  function confirmDeleteAction() {
+    if (!confirmDelete) return;
+    const { id } = confirmDelete;
+    setConfirmDelete(null);
     setDeletingId(id);
-    deleteVariant.mutate(id, { onSettled: () => setDeletingId(null) });
+    deleteVariant.mutate(id, {
+      onSettled: () => setDeletingId(null),
+      onError: (err) =>
+        setErrorMessage(getApiErrorMessage(err, 'Failed to delete variant. Please try again.')),
+    });
   }
 
   const isMutating = createVariant.isPending || updateVariant.isPending;
@@ -121,6 +146,24 @@ export function ProductVariantList({ productId, variants }: Props) {
             />
           </div>
         </div>
+      )}
+
+      {confirmDelete && (
+        <ConfirmModal
+          title="Delete Variant"
+          message={`Are you sure you want to delete variant "${confirmDelete.sku}"? This action cannot be undone.`}
+          confirmLabel="Delete"
+          onConfirm={confirmDeleteAction}
+          onCancel={() => setConfirmDelete(null)}
+        />
+      )}
+
+      {errorMessage && (
+        <AlertModal
+          title="Operation Failed"
+          message={errorMessage}
+          onClose={() => setErrorMessage(null)}
+        />
       )}
     </div>
   );

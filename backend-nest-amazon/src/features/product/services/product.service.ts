@@ -64,15 +64,15 @@ export class ProductService {
     await this.findOne(id);
 
     if (dto.slug) {
-      const existing = await this.productRepository.findBySlug(dto.slug);
-      if (existing && existing.id !== id) {
+      const conflict = await this.productRepository.findBySlugExcluding(dto.slug, id);
+      if (conflict) {
         throw new ConflictException(`Product slug "${dto.slug}" already exists`);
       }
     }
 
     if (dto.name) {
-      const existing = await this.productRepository.findByName(dto.name);
-      if (existing && existing.id !== id) {
+      const conflict = await this.productRepository.findByNameExcluding(dto.name, id);
+      if (conflict) {
         throw new ConflictException(`Product name "${dto.name}" already exists`);
       }
     }

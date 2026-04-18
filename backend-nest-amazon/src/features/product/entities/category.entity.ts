@@ -20,7 +20,7 @@ export class Category {
   @Column({ type: 'varchar', length: 120, unique: true })
   slug: string;
 
-  @Column({ name: 'parent_id', type: 'bigint', nullable: true })
+  @Column({ name: 'parent_id', type: 'bigint', nullable: true, transformer: { to: (v: number | null) => v, from: (v: string | null) => (v === null ? null : Number(v)) } })
   parentId: number | null;
 
   @ManyToOne(() => Category, (category) => category.children, {

@@ -17,7 +17,7 @@ export class Product {
   @PrimaryGeneratedColumn('increment', { type: 'bigint' })
   id: number;
 
-  @Column({ name: 'category_id', type: 'bigint', nullable: true })
+  @Column({ name: 'category_id', type: 'bigint', nullable: true, transformer: { to: (v: number | null) => v, from: (v: string | null) => (v === null ? null : Number(v)) } })
   categoryId: number | null;
 
   @ManyToOne(() => Category, { nullable: true, onDelete: 'SET NULL' })

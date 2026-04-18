@@ -7,6 +7,7 @@ import { useDeleteCategory } from '../hooks/useDeleteCategory';
 import { Pagination } from '@/shared/components/ui/Pagination';
 import { ConfirmModal } from '@/shared/components/ui/ConfirmModal';
 import { AlertModal } from '@/shared/components/ui/AlertModal';
+import { getApiErrorMessage } from '@/shared/utils/error.utils';
 
 interface Props {
   categories: Category[];
@@ -134,11 +135,7 @@ export function CategoryList({ categories }: Props) {
     deleteCategory.mutate(id, {
       onSettled: () => setDeletingId(null),
       onError: (err: unknown) => {
-        console.log('error', err)
-        const msg =
-          (err as { response?: { error?: { message?: string } } })?.response?.error?.message ??
-          'Failed to delete category. Please try again.';
-        setDeleteError(msg);
+        setDeleteError(getApiErrorMessage(err, 'Failed to delete category. Please try again.'));
       },
     });
   }

@@ -12,7 +12,7 @@ export class ProductImage {
   @PrimaryGeneratedColumn('increment', { type: 'bigint' })
   id: number;
 
-  @Column({ name: 'product_id', type: 'bigint' })
+  @Column({ name: 'product_id', type: 'bigint', transformer: { to: (v: number) => v, from: (v: string) => Number(v) } })
   productId: number;
 
   @ManyToOne(() => Product, (p) => p.images, { onDelete: 'CASCADE' })

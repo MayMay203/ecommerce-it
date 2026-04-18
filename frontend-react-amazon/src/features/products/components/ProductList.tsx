@@ -3,6 +3,7 @@ import type { Category } from '@/features/categories/types/category.types';
 import { Pagination } from '@/shared/components/ui/Pagination';
 import { ConfirmModal } from '@/shared/components/ui/ConfirmModal';
 import { AlertModal } from '@/shared/components/ui/AlertModal';
+import { getApiErrorMessage } from '@/shared/utils/error.utils';
 import type { Product } from '../types/product.types';
 import { ProductForm } from './ProductForm';
 import { ProductVariantList } from './ProductVariantList';
@@ -125,10 +126,7 @@ export function ProductList({ products, categories }: Props) {
     deleteProduct.mutate(id, {
       onSettled: () => setDeletingId(null),
       onError: (err: unknown) => {
-        const msg =
-          (err as { response?: { error?: { message?: string } } })?.response?.error?.message ??
-          'Failed to delete product. Please try again.';
-        setDeleteError(msg);
+        setDeleteError(getApiErrorMessage(err, 'Failed to delete product. Please try again.'));
       },
     });
   }
@@ -258,7 +256,7 @@ export function ProductList({ products, categories }: Props) {
             </div>
             <ProductVariantList
               productId={variantsProduct.id}
-              variants={variantsProduct.variants}
+              variants={products.find((p) => p.id === variantsProduct.id)?.variants ?? variantsProduct.variants}
             />
           </div>
         </div>
