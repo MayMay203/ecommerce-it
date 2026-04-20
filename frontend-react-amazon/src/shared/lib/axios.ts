@@ -46,8 +46,14 @@ api.interceptors.response.use(
           {},
           { withCredentials: true },
         );
-        setAccessToken(data.data.accessToken as string);
-        originalRequest.headers.Authorization = `Bearer ${data.data.accessToken}`;
+        const newToken: string | null = data?.data?.accessToken ?? null;
+        if (!newToken) {
+          setAccessToken(null);
+          window.location.href = '/login';
+          return Promise.reject(err);
+        }
+        setAccessToken(newToken);
+        originalRequest.headers.Authorization = `Bearer ${newToken}`;
         return api.request(originalRequest);
       } catch {
         setAccessToken(null);

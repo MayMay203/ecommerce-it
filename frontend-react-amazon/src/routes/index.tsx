@@ -7,6 +7,7 @@ import { AdminLayout } from '@/layouts/AdminLayout';
 import { ProtectedRoute } from './ProtectedRoute';
 import { AdminRoute } from './AdminRoute';
 
+const HomePage = lazy(() => import('@/pages/HomePage'));
 const LoginPage = lazy(() => import('@/features/auth/pages/LoginPage'));
 const RegisterPage = lazy(() => import('@/features/auth/pages/RegisterPage'));
 const RoleListPage = lazy(() => import('@/features/roles/pages/RoleListPage'));
@@ -24,19 +25,35 @@ const routes: RouteObject[] = [
     children: [
       {
         index: true,
-        element: <div className="p-8 text-center"><h1 className="text-2xl font-bold">Welcome to Ecommerce</h1></div>,
+        element: (
+          <Suspense fallback={<div className="p-6 text-gray-400">Loading…</div>}>
+            <HomePage />
+          </Suspense>
+        ),
       },
       {
         path: 'products',
-        element: <div>Product List Page — coming soon</div>,
+        element: (
+          <Suspense fallback={<div className="p-6 text-gray-400">Loading…</div>}>
+            <UserProductListPage />
+          </Suspense>
+        ),
       },
       {
         path: 'products/:slug',
-        element: <div>Product Detail Page — coming soon</div>,
+        element: (
+          <Suspense fallback={<div className="p-6 text-gray-400">Loading…</div>}>
+            <UserProductDetailPage />
+          </Suspense>
+        ),
       },
       {
         path: 'categories/:slug',
-        element: <div>Category Page — coming soon</div>,
+        element: (
+          <Suspense fallback={<div className="p-6 text-gray-400">Loading…</div>}>
+            <UserProductListPage />
+          </Suspense>
+        ),
       },
     ],
   },
@@ -96,7 +113,7 @@ const routes: RouteObject[] = [
             path: 'products',
             element: (
               <Suspense fallback={<div className="p-6 text-gray-400">Loading…</div>}>
-                <ProductListPage />
+                <AdminProductListPage />
               </Suspense>
             ),
           },

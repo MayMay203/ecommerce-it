@@ -94,7 +94,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Refresh access token using httpOnly cookie' })
   async refresh(@Req() req: Request) {
-    const rawToken = this.extractRefreshCookie(req);
+    const rawToken = req.cookies?.[REFRESH_COOKIE] as string | undefined;
     if (!rawToken) {
       return { data: { accessToken: null }, message: 'No refresh token' };
     }
@@ -111,7 +111,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Revoke refresh token and clear cookie' })
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
-    const rawToken = this.extractRefreshCookie(req);
+    const rawToken = req.cookies?.[REFRESH_COOKIE] as string | undefined;
     await this.authService.logout(rawToken ?? '');
     res.clearCookie(REFRESH_COOKIE);
     return { message: 'Logged out successfully' };
@@ -142,13 +142,4 @@ export class AuthController {
     return { message: 'Password changed successfully' };
   }
 
-  // ---------------------------------------------------------------------------
-  // Private helpers
-  // ---------------------------------------------------------------------------
-
-  private extractRefreshCookie(req: Request): string | undefined {
-    const cookieHeader = (req.headers['cookie'] as string) ?? '';
-    const match = cookieHeader.match(/(?:^|;\s*)refresh_token=([^;]+)/);
-    return match?.[1];
-  }
 }

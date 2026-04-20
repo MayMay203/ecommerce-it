@@ -55,8 +55,8 @@ export function ProductFilters({ categories }: Props) {
   const hasFilters =
     !!selectedCategory || !!minPriceParam || !!maxPriceParam;
 
-  const roots = categories.filter((c) => c.parentId === null);
-  const childrenOf = (id: number) => categories.filter((c) => c.parentId === id);
+  const roots = categories.filter((c) => c.parentId === null || c.parentId === undefined);
+  const childrenOf = (id: number) => categories.filter((c) => Number(c.parentId) === Number(id));
 
   return (
     <aside className="flex flex-col gap-6 w-56 flex-shrink-0">
@@ -88,9 +88,9 @@ export function ProductFilters({ categories }: Props) {
           {roots.map((cat) => (
             <li key={cat.id}>
               <button
-                onClick={() => setParam('category', String(cat.id))}
+                onClick={() => setParam('category', String(Number(cat.id)))}
                 className={`w-full text-left px-2 py-1 rounded hover:bg-gray-100 transition-colors ${
-                  selectedCategory === cat.id
+                  selectedCategory === Number(cat.id)
                     ? 'font-medium text-blue-600'
                     : 'text-gray-600'
                 }`}
@@ -102,9 +102,9 @@ export function ProductFilters({ categories }: Props) {
                   {childrenOf(cat.id).map((child) => (
                     <li key={child.id}>
                       <button
-                        onClick={() => setParam('category', String(child.id))}
+                        onClick={() => setParam('category', String(Number(child.id)))}
                         className={`w-full text-left px-2 py-1 rounded hover:bg-gray-100 transition-colors text-xs ${
-                          selectedCategory === child.id
+                          selectedCategory === Number(child.id)
                             ? 'font-medium text-blue-600'
                             : 'text-gray-500'
                         }`}

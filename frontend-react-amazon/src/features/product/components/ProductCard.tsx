@@ -1,6 +1,7 @@
 import { Link } from 'react-router';
 import type { Product } from '../types/product.types';
 import { formatPrice, getDisplayPrice } from '../utils/product.utils';
+import { useAddToCart } from '@/features/cart/hooks/useAddToCart';
 
 interface Props {
   product: Product;
@@ -9,6 +10,14 @@ interface Props {
 export function ProductCard({ product }: Props) {
   const { price, salePrice } = getDisplayPrice(product.variants);
   const inStock = product.variants.some((v) => v.stockQuantity > 0);
+  const { mutate: addToCart, isPending } = useAddToCart();
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const firstInStockVariant = product.variants.find((v) => v.stockQuantity > 0);
+    if (!firstInStockVariant) return;
+    addToCart({ productVariantId: firstInStockVariant.id, quantity: 1 });
+  };
 
   return (
     <Link
@@ -62,6 +71,18 @@ export function ProductCard({ product }: Props) {
             </span>
           )}
         </div>
+
+        <button
+          onClick={handleAddToCart}
+          disabled={!inStock || isPending}
+          className={`mt-2 w-full rounded py-1.5 text-xs font-semibold transition-colors ${
+            inStock
+              ? 'bg-blue-600 text-white hover:bg-blue-700'
+              : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+          }`}
+        >
+          {isPending ? 'Adding…' : inStock ? 'Add to Cart' : 'Out of Stock'}
+        </button>
       </div>
     </Link>
   );

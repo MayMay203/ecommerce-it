@@ -1,20 +1,9 @@
 import type { ProductVariant } from '../types/product.types';
-import { getEffectivePrice } from '../utils/product.utils';
 
 interface Props {
   variants: ProductVariant[];
   selectedId: number | null;
   onSelect: (variant: ProductVariant) => void;
-}
-
-function groupBy<T>(items: T[], key: keyof T): Map<string, T[]> {
-  const map = new Map<string, T[]>();
-  for (const item of items) {
-    const k = String(item[key] ?? '');
-    if (!map.has(k)) map.set(k, []);
-    map.get(k)!.push(item);
-  }
-  return map;
 }
 
 export function VariantSelector({ variants, selectedId, onSelect }: Props) {

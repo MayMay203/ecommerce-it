@@ -5,6 +5,7 @@ import { ProductImageGallery } from '../components/ProductImageGallery';
 import { VariantSelector } from '../components/VariantSelector';
 import { formatPrice, getEffectivePrice } from '../utils/product.utils';
 import type { ProductVariant } from '../types/product.types';
+import { useAddToCart } from '@/features/cart/hooks/useAddToCart';
 
 function ProductDetailSkeleton() {
   return (
@@ -26,6 +27,7 @@ export default function ProductDetailPage() {
   const { slug = '' } = useParams<{ slug: string }>();
   const { data: product, isLoading, isError } = useProductDetail(slug);
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
+  const { mutate: addToCart, isPending } = useAddToCart();
 
   if (isLoading) return <ProductDetailSkeleton />;
 
@@ -43,6 +45,11 @@ export default function ProductDetailPage() {
   const activeVariant = selectedVariant ?? product.variants[0] ?? null;
   const effectivePrice = activeVariant ? getEffectivePrice(activeVariant) : null;
   const inStock = activeVariant ? activeVariant.stockQuantity > 0 : false;
+
+  const handleAddToCart = () => {
+    if (!activeVariant || !inStock) return;
+    addToCart({ productVariantId: activeVariant.id, quantity: 1 });
+  };
 
   return (
     <div className="flex flex-col gap-6">
@@ -106,14 +113,15 @@ export default function ProductDetailPage() {
           {/* Add to cart */}
           <div className="flex flex-col gap-2">
             <button
-              disabled={!inStock}
+              onClick={handleAddToCart}
+              disabled={!inStock || isPending}
               className={`rounded-lg px-6 py-3 text-sm font-semibold transition-colors ${
                 inStock
                   ? 'bg-blue-600 text-white hover:bg-blue-700'
                   : 'bg-gray-100 text-gray-400 cursor-not-allowed'
               }`}
             >
-              {inStock ? 'Add to Cart' : 'Out of Stock'}
+              {isPending ? 'Adding…' : inStock ? 'Add to Cart' : 'Out of Stock'}
             </button>
             {activeVariant && (
               <p className="text-xs text-gray-500 text-center">
