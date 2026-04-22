@@ -1,4 +1,4 @@
-import type { ProductVariant } from '../types/product.types';
+import type { Category, ProductVariant } from '../types/product.types';
 
 export function getDisplayPrice(variants: ProductVariant[]): {
   price: number;
@@ -26,4 +26,31 @@ export function getEffectivePrice(variant: ProductVariant): number {
 
 export function buildSlugUrl(slug: string): string {
   return `/products/${slug}`;
+}
+
+export function getCategoryAndDescendantIds(
+  rootId: number,
+  categories: Category[],
+): Set<number> {
+  const childrenByParent = new Map<number, number[]>();
+  for (const c of categories) {
+    const parentId = c.parentId === null ? null : Number(c.parentId);
+    if (parentId === null) continue;
+    const list = childrenByParent.get(parentId) ?? [];
+    list.push(Number(c.id));
+    childrenByParent.set(parentId, list);
+  }
+
+  const result = new Set<number>([rootId]);
+  const queue = [rootId];
+  while (queue.length > 0) {
+    const current = queue.shift()!;
+    for (const childId of childrenByParent.get(current) ?? []) {
+      if (!result.has(childId)) {
+        result.add(childId);
+        queue.push(childId);
+      }
+    }
+  }
+  return result;
 }

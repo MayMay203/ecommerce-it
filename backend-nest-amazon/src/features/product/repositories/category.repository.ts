@@ -12,8 +12,6 @@ export class CategoryRepository {
 
   findAll(): Promise<Category[]> {
     return this.repo.find({
-      relations: ['children'],
-      where: { parentId: IsNull() },
       order: { name: 'ASC' },
     });
   }

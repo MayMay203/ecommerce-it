@@ -1,14 +1,19 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useCategories } from '@/features/categories/hooks/useCategories';
 import { productService } from '../services/product.service';
 import type { Product, ProductFilters } from '../types/product.types';
-import { getEffectivePrice } from '../utils/product.utils';
+import { getCategoryAndDescendantIds, getEffectivePrice } from '../utils/product.utils';
 
-function applyFilters(products: Product[], filters: ProductFilters): Product[] {
+function applyFilters(
+  products: Product[],
+  filters: ProductFilters,
+  allowedCategoryIds: Set<number> | null,
+): Product[] {
   return products.filter((p) => {
     if (!p.isActive) return false;
 
-    if (filters.categoryId !== undefined && Number(p.categoryId) !== filters.categoryId) return false;
+    if (allowedCategoryIds && !allowedCategoryIds.has(Number(p.categoryId))) return false;
 
     if (filters.search) {
       const q = filters.search.toLowerCase();
@@ -33,10 +38,17 @@ export function useProducts(filters: ProductFilters = {}) {
     staleTime: 5 * 60 * 1000,
   });
 
+  const { data: categories = [] } = useCategories();
+
+  const allowedCategoryIds = useMemo(() => {
+    if (filters.categoryId === undefined) return null;
+    return getCategoryAndDescendantIds(filters.categoryId, categories);
+  }, [filters.categoryId, categories]);
+
   const data = useMemo(
-    () => applyFilters(query.data ?? [], filters),
+    () => applyFilters(query.data ?? [], filters, allowedCategoryIds),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [query.data, filters.categoryId, filters.search, filters.minPrice, filters.maxPrice],
+    [query.data, allowedCategoryIds, filters.search, filters.minPrice, filters.maxPrice],
   );
 
   return { ...query, data };
