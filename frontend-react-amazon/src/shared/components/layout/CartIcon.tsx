@@ -1,13 +1,12 @@
-import { Link } from 'react-router';
-import { ROUTES } from '@/routes/routes';
 import { useCartStore } from '@/features/cart/stores/cart.store';
 
 export function CartIcon() {
   const cartCount = useCartStore((s) => s.cartCount);
+  const openCart = useCartStore((s) => s.openCart);
 
   return (
-    <Link
-      to={ROUTES.CART}
+    <button
+      onClick={openCart}
       className="group flex items-center gap-2 rounded-md border border-transparent px-2 py-1.5 hover:border-white/60"
       aria-label={`Cart with ${cartCount} items`}
     >
@@ -34,6 +33,6 @@ export function CartIcon() {
         </span>
       </div>
       <span className="hidden text-sm font-semibold text-white md:inline">Cart</span>
-    </Link>
+    </button>
   );
 }

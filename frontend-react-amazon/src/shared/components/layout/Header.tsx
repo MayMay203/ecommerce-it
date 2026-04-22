@@ -4,6 +4,7 @@ import { CartIcon } from './CartIcon';
 import { SearchBar } from './SearchBar';
 import { UserMenu } from './UserMenu';
 import { CategoryNav } from './CategoryNav';
+import { CartDrawer } from '@/features/cart/components/CartDrawer';
 
 export function Header() {
   return (
@@ -36,6 +37,7 @@ export function Header() {
       </div>
 
       <CategoryNav />
+      <CartDrawer />
     </header>
   );
 }
