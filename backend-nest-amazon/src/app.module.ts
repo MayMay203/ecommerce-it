@@ -18,6 +18,7 @@ import { ProductModule } from './features/product/product.module';
 import { CartModule } from './features/cart/cart.module';
 import { OrderModule } from './features/order/order.module';
 import { ReviewModule } from './features/review/review.module';
+import { WishlistModule } from './features/wishlist/wishlist.module';
 
 @Module({
   controllers: [AppController],
@@ -41,6 +42,7 @@ import { ReviewModule } from './features/review/review.module';
     CartModule,
     OrderModule,
     ReviewModule,
+    WishlistModule,
   ],
 })
 export class AppModule {}
