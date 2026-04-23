@@ -1,4 +1,4 @@
-import { useNavigate, Link } from 'react-router';
+import { useNavigate, useLocation, Link } from 'react-router';
 import { ROUTES } from '@/routes/routes';
 import { useLogin } from '../hooks/useLogin';
 import { LoginForm } from '../components/LoginForm';
@@ -6,12 +6,19 @@ import type { LoginRequest } from '../types/auth.types';
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const login = useLogin();
+
+  const from = (location.state as { from?: string } | null)?.from;
 
   async function handleSubmit(data: LoginRequest) {
     login.mutate(data, {
       onSuccess: (res) => {
         const role = res.data.user.role;
+        if (from && from.startsWith('/') && !from.startsWith('//')) {
+          navigate(from, { replace: true });
+          return;
+        }
         const dest = role === 'admin' || role === 'moderator'
           ? ROUTES.ADMIN_PRODUCTS
           : ROUTES.HOME;

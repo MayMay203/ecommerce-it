@@ -69,6 +69,9 @@ export function UserMenu() {
           <MenuLink to={ROUTES.ORDERS} onClick={() => setOpen(false)}>
             Your Orders
           </MenuLink>
+          <MenuLink to={ROUTES.WISHLIST} onClick={() => setOpen(false)}>
+            Your Wishlist
+          </MenuLink>
           <MenuLink to={ROUTES.ADDRESSES} onClick={() => setOpen(false)}>
             Your Addresses
           </MenuLink>

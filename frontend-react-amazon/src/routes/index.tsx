@@ -16,6 +16,7 @@ const CategoryListPage = lazy(() => import('@/features/categories/pages/Category
 const AdminProductListPage = lazy(() => import('@/features/products/pages/ProductListPage'));
 const UserProductListPage = lazy(() => import('@/features/product/pages/ProductListPage'));
 const UserProductDetailPage = lazy(() => import('@/features/product/pages/ProductDetailPage'));
+const WishlistPage = lazy(() => import('@/features/wishlist/pages/WishlistPage'));
 
 const routes: RouteObject[] = [
   // Public routes — MainLayout
@@ -91,6 +92,14 @@ const routes: RouteObject[] = [
         element: <MainLayout />,
         children: [
           { path: 'cart', element: <div>Cart Page — coming soon</div> },
+          {
+            path: 'wishlist',
+            element: (
+              <Suspense fallback={<div className="p-6 text-gray-400">Loading…</div>}>
+                <WishlistPage />
+              </Suspense>
+            ),
+          },
           { path: 'checkout', element: <div>Checkout Page — coming soon</div> },
           { path: 'orders', element: <div>Orders Page — coming soon</div> },
           { path: 'orders/:id', element: <div>Order Detail Page — coming soon</div> },

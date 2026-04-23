@@ -5,6 +5,7 @@ import { SearchBar } from './SearchBar';
 import { UserMenu } from './UserMenu';
 import { CategoryNav } from './CategoryNav';
 import { CartDrawer } from '@/features/cart/components/CartDrawer';
+import { WishlistIcon } from './WishlistIcon';
 
 export function Header() {
   return (
@@ -27,6 +28,7 @@ export function Header() {
 
           <div className="ml-auto flex items-center gap-1 md:gap-3">
             <UserMenu />
+            <WishlistIcon />
             <CartIcon />
           </div>
         </div>

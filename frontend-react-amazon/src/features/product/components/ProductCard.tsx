@@ -2,6 +2,7 @@ import { Link } from 'react-router';
 import type { Product } from '../types/product.types';
 import { formatPrice, getDisplayPrice } from '../utils/product.utils';
 import { useAddToCart } from '@/features/cart/hooks/useAddToCart';
+import { WishlistButton } from '@/features/wishlist';
 
 interface Props {
   product: Product;
@@ -46,6 +47,10 @@ export function ProductCard({ product }: Props) {
             Sale
           </span>
         )}
+        <WishlistButton
+          productId={product.id}
+          className="absolute bottom-2 right-2 bg-white/90 shadow-sm hover:bg-white"
+        />
       </div>
 
       <div className="flex flex-col gap-1 p-3">
