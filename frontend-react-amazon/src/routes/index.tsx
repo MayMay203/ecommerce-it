@@ -17,6 +17,8 @@ const AdminProductListPage = lazy(() => import('@/features/products/pages/Produc
 const UserProductListPage = lazy(() => import('@/features/product/pages/ProductListPage'));
 const UserProductDetailPage = lazy(() => import('@/features/product/pages/ProductDetailPage'));
 const WishlistPage = lazy(() => import('@/features/wishlist/pages/WishlistPage'));
+const ProfilePage = lazy(() => import('@/features/user-profile/pages/ProfilePage'));
+const AddressListPage = lazy(() => import('@/features/user-profile/pages/AddressListPage'));
 
 const routes: RouteObject[] = [
   // Public routes — MainLayout
@@ -103,8 +105,22 @@ const routes: RouteObject[] = [
           { path: 'checkout', element: <div>Checkout Page — coming soon</div> },
           { path: 'orders', element: <div>Orders Page — coming soon</div> },
           { path: 'orders/:id', element: <div>Order Detail Page — coming soon</div> },
-          { path: 'profile', element: <div>Profile Page — coming soon</div> },
-          { path: 'profile/addresses', element: <div>Addresses Page — coming soon</div> },
+          {
+            path: 'profile',
+            element: (
+              <Suspense fallback={<div className="p-6 text-gray-400">Loading…</div>}>
+                <ProfilePage />
+              </Suspense>
+            ),
+          },
+          {
+            path: 'profile/addresses',
+            element: (
+              <Suspense fallback={<div className="p-6 text-gray-400">Loading…</div>}>
+                <AddressListPage />
+              </Suspense>
+            ),
+          },
         ],
       },
     ],
