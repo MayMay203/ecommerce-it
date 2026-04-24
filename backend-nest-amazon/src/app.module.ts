@@ -19,6 +19,7 @@ import { CartModule } from './features/cart/cart.module';
 import { OrderModule } from './features/order/order.module';
 import { ReviewModule } from './features/review/review.module';
 import { WishlistModule } from './features/wishlist/wishlist.module';
+import { CouponModule } from './features/coupon/coupon.module';
 
 @Module({
   controllers: [AppController],
@@ -43,6 +44,7 @@ import { WishlistModule } from './features/wishlist/wishlist.module';
     OrderModule,
     ReviewModule,
     WishlistModule,
+    CouponModule,
   ],
 })
 export class AppModule {}

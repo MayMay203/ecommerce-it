@@ -17,6 +17,7 @@ const AdminProductListPage = lazy(() => import('@/features/products/pages/Produc
 const UserProductListPage = lazy(() => import('@/features/product/pages/ProductListPage'));
 const UserProductDetailPage = lazy(() => import('@/features/product/pages/ProductDetailPage'));
 const WishlistPage = lazy(() => import('@/features/wishlist/pages/WishlistPage'));
+const CheckoutPage = lazy(() => import('@/features/checkout/pages/CheckoutPage'));
 const ProfilePage = lazy(() => import('@/features/user-profile/pages/ProfilePage'));
 const AddressListPage = lazy(() => import('@/features/user-profile/pages/AddressListPage'));
 
@@ -102,7 +103,14 @@ const routes: RouteObject[] = [
               </Suspense>
             ),
           },
-          { path: 'checkout', element: <div>Checkout Page — coming soon</div> },
+          {
+            path: 'checkout',
+            element: (
+              <Suspense fallback={<div className="p-6 text-gray-400">Loading…</div>}>
+                <CheckoutPage />
+              </Suspense>
+            ),
+          },
           { path: 'orders', element: <div>Orders Page — coming soon</div> },
           { path: 'orders/:id', element: <div>Order Detail Page — coming soon</div> },
           {
