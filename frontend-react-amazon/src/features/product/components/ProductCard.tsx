@@ -1,8 +1,10 @@
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import type { Product } from '../types/product.types';
 import { formatPrice, getDisplayPrice } from '../utils/product.utils';
 import { useAddToCart } from '@/features/cart/hooks/useAddToCart';
 import { WishlistButton } from '@/features/wishlist';
+import { useAuthStore } from '@/features/auth/stores/auth.store';
+import { ROUTES } from '@/routes/routes';
 
 interface Props {
   product: Product;
@@ -12,9 +14,15 @@ export function ProductCard({ product }: Props) {
   const { price, salePrice } = getDisplayPrice(product.variants);
   const inStock = product.variants.some((v) => v.stockQuantity > 0);
   const { mutate: addToCart, isPending } = useAddToCart();
+  const { isAuthenticated } = useAuthStore();
+  const navigate = useNavigate();
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
+    if (!isAuthenticated) {
+      navigate(ROUTES.LOGIN);
+      return;
+    }
     const firstInStockVariant = product.variants.find((v) => v.stockQuantity > 0);
     if (!firstInStockVariant) return;
     addToCart({ productVariantId: firstInStockVariant.id, quantity: 1 });
@@ -53,7 +61,7 @@ export function ProductCard({ product }: Props) {
         />
       </div>
 
-      <div className="flex flex-col gap-1 p-3">
+      <div className="flex flex-col gap-1 p-3 flex-1">
         {product.category && (
           <span className="text-xs text-gray-400">{product.category.name}</span>
         )}
@@ -80,7 +88,7 @@ export function ProductCard({ product }: Props) {
         <button
           onClick={handleAddToCart}
           disabled={!inStock || isPending}
-          className={`mt-2 w-full rounded py-1.5 text-xs font-semibold transition-colors ${
+          className={`mt-auto w-full rounded py-1.5 text-xs font-semibold transition-colors ${
             inStock
               ? 'bg-blue-600 text-white hover:bg-blue-700'
               : 'bg-gray-100 text-gray-400 cursor-not-allowed'

@@ -1,12 +1,25 @@
+import { useNavigate } from 'react-router';
 import { useCartStore } from '@/features/cart/stores/cart.store';
+import { useAuthStore } from '@/features/auth/stores/auth.store';
+import { ROUTES } from '@/routes/routes';
 
 export function CartIcon() {
   const cartCount = useCartStore((s) => s.cartCount);
   const openCart = useCartStore((s) => s.openCart);
+  const { isAuthenticated } = useAuthStore();
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    if (!isAuthenticated) {
+      navigate(ROUTES.LOGIN);
+      return;
+    }
+    openCart();
+  };
 
   return (
     <button
-      onClick={openCart}
+      onClick={handleClick}
       className="group flex items-center gap-2 rounded-md border border-transparent px-2 py-1.5 hover:border-white/60"
       aria-label={`Cart with ${cartCount} items`}
     >

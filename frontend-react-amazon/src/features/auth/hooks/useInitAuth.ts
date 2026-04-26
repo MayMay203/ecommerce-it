@@ -2,11 +2,13 @@ import { useEffect, useState } from 'react';
 import { setAccessToken } from '@/shared/lib/axios';
 import { authService } from '../services/auth.service';
 import { useAuthStore } from '../stores/auth.store';
+import { useCartStore } from '@/features/cart/stores/cart.store';
 
 export function useInitAuth() {
   const [isReady, setIsReady] = useState(false);
   const setUser = useAuthStore((s) => s.setUser);
   const clear = useAuthStore((s) => s.clear);
+  const setCartCount = useCartStore((s) => s.setCartCount);
 
   useEffect(() => {
     let cancelled = false;
@@ -22,6 +24,7 @@ export function useInitAuth() {
         const token = refreshRes.data.accessToken;
         if (!token) {
           clear();
+          setCartCount(0);
           setIsReady(true);
           return;
         }
@@ -45,6 +48,7 @@ export function useInitAuth() {
         if (!cancelled) {
           setAccessToken(null);
           clear();
+          setCartCount(0);
         }
       } finally {
         if (!cancelled) setIsReady(true);
@@ -53,7 +57,7 @@ export function useInitAuth() {
 
     init();
     return () => { cancelled = true; };
-  }, [setUser, clear]);
+  }, [setUser, clear, setCartCount]);
 
   return isReady;
 }

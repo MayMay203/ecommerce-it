@@ -16,6 +16,7 @@ const CategoryListPage = lazy(() => import('@/features/categories/pages/Category
 const AdminProductListPage = lazy(() => import('@/features/products/pages/ProductListPage'));
 const UserProductListPage = lazy(() => import('@/features/product/pages/ProductListPage'));
 const UserProductDetailPage = lazy(() => import('@/features/product/pages/ProductDetailPage'));
+const CartPage = lazy(() => import('@/features/cart/pages/CartPage'));
 const WishlistPage = lazy(() => import('@/features/wishlist/pages/WishlistPage'));
 const CheckoutPage = lazy(() => import('@/features/checkout/pages/CheckoutPage'));
 const ProfilePage = lazy(() => import('@/features/user-profile/pages/ProfilePage'));
@@ -94,7 +95,14 @@ const routes: RouteObject[] = [
       {
         element: <MainLayout />,
         children: [
-          { path: 'cart', element: <div>Cart Page — coming soon</div> },
+          {
+            path: 'cart',
+            element: (
+              <Suspense fallback={<div className="p-6 text-gray-400">Loading…</div>}>
+                <CartPage />
+              </Suspense>
+            ),
+          },
           {
             path: 'wishlist',
             element: (

@@ -1,7 +1,8 @@
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import { ROUTES } from '@/routes/routes';
 import { useAddToCart } from '@/features/cart';
 import { formatPrice, getDisplayPrice } from '@/features/product';
+import { useAuthStore } from '@/features/auth/stores/auth.store';
 import { useWishlist } from '../hooks/useWishlist';
 import { useRemoveFromWishlist } from '../hooks/useRemoveFromWishlist';
 import { useClearWishlist } from '../hooks/useClearWishlist';
@@ -83,12 +84,18 @@ interface WishlistItemCardProps {
 function WishlistItemCard({ item }: WishlistItemCardProps) {
   const { mutate: removeFromWishlist, isPending: isRemoving } = useRemoveFromWishlist();
   const { mutate: addToCart, isPending: isAddingToCart } = useAddToCart();
+  const { isAuthenticated } = useAuthStore();
+  const navigate = useNavigate();
   const { product } = item;
   const variants = product.variants ?? [];
   const { price, salePrice } = getDisplayPrice(variants);
   const inStock = variants.some((v) => v.stockQuantity > 0);
 
   function handleAddToCart() {
+    if (!isAuthenticated) {
+      navigate(ROUTES.LOGIN);
+      return;
+    }
     const firstInStockVariant = variants.find((v) => v.stockQuantity > 0);
     if (!firstInStockVariant) return;
     addToCart({ productVariantId: firstInStockVariant.id, quantity: 1 });
@@ -118,7 +125,7 @@ function WishlistItemCard({ item }: WishlistItemCardProps) {
         )}
       </Link>
 
-      <div className="flex flex-col gap-2 p-3">
+      <div className="flex flex-col gap-2 p-3 flex-1">
         <Link
           to={ROUTES.PRODUCT_DETAIL.replace(':slug', product.slug)}
           className="text-sm font-medium text-gray-900 line-clamp-2 hover:text-blue-600"
@@ -139,27 +146,29 @@ function WishlistItemCard({ item }: WishlistItemCardProps) {
           )}
         </div>
 
-        <button
-          type="button"
-          onClick={handleAddToCart}
-          disabled={!inStock || isAddingToCart}
-          className={`w-full rounded py-1.5 text-xs font-semibold transition-colors ${
-            inStock
-              ? 'bg-blue-600 text-white hover:bg-blue-700'
-              : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-          }`}
-        >
-          {isAddingToCart ? 'Adding…' : inStock ? 'Add to Cart' : 'Out of Stock'}
-        </button>
+        <div className="flex flex-col gap-2 mt-auto">
+          <button
+            type="button"
+            onClick={handleAddToCart}
+            disabled={!inStock || isAddingToCart}
+            className={`w-full rounded py-1.5 text-xs font-semibold transition-colors ${
+              inStock
+                ? 'bg-blue-600 text-white hover:bg-blue-700'
+                : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+            }`}
+          >
+            {isAddingToCart ? 'Adding…' : inStock ? 'Add to Cart' : 'Out of Stock'}
+          </button>
 
-        <button
-          type="button"
-          onClick={() => removeFromWishlist(item.productId)}
-          disabled={isRemoving}
-          className="w-full rounded border border-gray-200 py-1.5 text-xs text-gray-500 hover:border-red-300 hover:text-red-500 disabled:opacity-50 transition-colors"
-        >
-          {isRemoving ? 'Removing…' : 'Remove'}
-        </button>
+          <button
+            type="button"
+            onClick={() => removeFromWishlist(item.productId)}
+            disabled={isRemoving}
+            className="w-full rounded border border-gray-200 py-1.5 text-xs text-gray-500 hover:border-red-300 hover:text-red-500 disabled:opacity-50 transition-colors"
+          >
+            {isRemoving ? 'Removing…' : 'Remove'}
+          </button>
+        </div>
       </div>
     </div>
   );

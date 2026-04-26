@@ -1,11 +1,13 @@
 import { useState } from 'react';
-import { Link, useParams } from 'react-router';
+import { Link, useParams, useNavigate } from 'react-router';
 import { useProductDetail } from '../hooks/useProductDetail';
 import { ProductImageGallery } from '../components/ProductImageGallery';
 import { VariantSelector } from '../components/VariantSelector';
 import { formatPrice, getEffectivePrice } from '../utils/product.utils';
 import type { ProductVariant } from '../types/product.types';
 import { useAddToCart } from '@/features/cart/hooks/useAddToCart';
+import { useAuthStore } from '@/features/auth/stores/auth.store';
+import { ROUTES } from '@/routes/routes';
 
 function ProductDetailSkeleton() {
   return (
@@ -28,6 +30,8 @@ export default function ProductDetailPage() {
   const { data: product, isLoading, isError } = useProductDetail(slug);
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
   const { mutate: addToCart, isPending } = useAddToCart();
+  const { isAuthenticated } = useAuthStore();
+  const navigate = useNavigate();
 
   if (isLoading) return <ProductDetailSkeleton />;
 
@@ -47,6 +51,10 @@ export default function ProductDetailPage() {
   const inStock = activeVariant ? activeVariant.stockQuantity > 0 : false;
 
   const handleAddToCart = () => {
+    if (!isAuthenticated) {
+      navigate(ROUTES.LOGIN);
+      return;
+    }
     if (!activeVariant || !inStock) return;
     addToCart({ productVariantId: activeVariant.id, quantity: 1 });
   };
