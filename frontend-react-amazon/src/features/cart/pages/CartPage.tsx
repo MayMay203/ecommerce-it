@@ -1,16 +1,36 @@
-import { Link } from 'react-router';
+import { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router';
 import { ROUTES } from '@/routes/routes';
 import { useCart } from '../hooks/useCart';
 import { useRemoveCartItem } from '../hooks/useRemoveCartItem';
 import { useUpdateCartItem } from '../hooks/useUpdateCartItem';
+import { useCartStore } from '../stores/cart.store';
 
 export default function CartPage() {
   const { data: cart, isLoading } = useCart();
+  const navigate = useNavigate();
   const items = cart?.items ?? [];
-  const subtotal = items.reduce(
+  const { selectedItems, toggleItemSelection, selectAllItems, clearSelection } = useCartStore();
+
+  useEffect(() => {
+    if (items.length > 0 && selectedItems.size === 0) {
+      selectAllItems(items.map((item) => item.id));
+    }
+  }, [items.length]);
+
+  const selectedItemsList = items.filter((item) => selectedItems.has(item.id));
+  const subtotal = selectedItemsList.reduce(
     (sum, item) => sum + Number(item.variant.price) * item.quantity,
     0,
   );
+
+  const handleCheckoutSelected = () => {
+    if (selectedItemsList.length === 0) {
+      alert('Please select at least one item');
+      return;
+    }
+    navigate(ROUTES.CHECKOUT);
+  };
 
   if (isLoading) {
     return (
@@ -46,9 +66,34 @@ export default function CartPage() {
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2">
             <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
+              {/* Select All */}
+              <div className="border-b bg-gray-50 px-4 py-3 flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  checked={selectedItems.size > 0 && selectedItems.size === items.length}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      selectAllItems(items.map((item) => item.id));
+                    } else {
+                      clearSelection();
+                    }
+                  }}
+                  className="h-4 w-4 rounded border-gray-300 text-blue-600 cursor-pointer"
+                />
+                <span className="text-sm font-medium text-gray-700">
+                  {selectedItems.size > 0 ? `${selectedItems.size} selected` : 'Select all items'}
+                </span>
+              </div>
+
+              {/* Items */}
               <div className="divide-y">
                 {items.map((item) => (
-                  <CartItemRow key={item.id} item={item} />
+                  <CartItemRow
+                    key={item.id}
+                    item={item}
+                    isSelected={selectedItems.has(item.id)}
+                    onToggleSelect={() => toggleItemSelection(item.id)}
+                  />
                 ))}
               </div>
             </div>
@@ -56,6 +101,13 @@ export default function CartPage() {
 
           <div className="h-fit rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
             <h2 className="mb-4 text-lg font-semibold text-gray-900">Order Summary</h2>
+            <div className="mb-2 text-xs text-gray-500">
+              {selectedItemsList.length > 0 ? (
+                <p>{selectedItemsList.length} item{selectedItemsList.length !== 1 ? 's' : ''} selected</p>
+              ) : (
+                <p className="text-red-500 font-medium">No items selected</p>
+              )}
+            </div>
             <div className="mb-4 space-y-2">
               <div className="flex justify-between text-sm text-gray-600">
                 <span>Subtotal</span>
@@ -63,21 +115,22 @@ export default function CartPage() {
               </div>
               <div className="flex justify-between text-sm text-gray-600">
                 <span>Shipping</span>
-                <span>Free</span>
+                <span>$10.00</span>
               </div>
               <div className="border-t pt-2">
                 <div className="flex justify-between font-semibold text-gray-900">
                   <span>Total</span>
-                  <span>${subtotal.toFixed(2)}</span>
+                  <span>${(subtotal + 10).toFixed(2)}</span>
                 </div>
               </div>
             </div>
-            <Link
-              to={ROUTES.CHECKOUT}
-              className="block w-full rounded-lg bg-blue-600 py-2.5 text-center text-sm font-semibold text-white hover:bg-blue-700"
+            <button
+              onClick={handleCheckoutSelected}
+              disabled={selectedItemsList.length === 0}
+              className="block w-full rounded-lg bg-blue-600 py-2.5 text-center text-sm font-semibold text-white hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
             >
               Proceed to Checkout
-            </Link>
+            </button>
             <Link
               to={ROUTES.PRODUCTS}
               className="mt-2 block text-center text-sm text-gray-600 hover:text-gray-900"
@@ -93,9 +146,11 @@ export default function CartPage() {
 
 interface CartItemRowProps {
   item: any;
+  isSelected: boolean;
+  onToggleSelect: () => void;
 }
 
-function CartItemRow({ item }: CartItemRowProps) {
+function CartItemRow({ item, isSelected, onToggleSelect }: CartItemRowProps) {
   const { mutate: removeItem, isPending: isRemoving } = useRemoveCartItem();
   const { mutate: updateItem, isPending: isUpdating } = useUpdateCartItem();
   const isPending = isRemoving || isUpdating;
@@ -105,7 +160,13 @@ function CartItemRow({ item }: CartItemRowProps) {
   const itemTotal = Number(variant.price) * item.quantity;
 
   return (
-    <div className="flex gap-4 p-4">
+    <div className="flex gap-4 p-4 hover:bg-gray-50 transition-colors">
+      <input
+        type="checkbox"
+        checked={isSelected}
+        onChange={onToggleSelect}
+        className="h-5 w-5 rounded border-gray-300 text-blue-600 cursor-pointer mt-2 shrink-0"
+      />
       <div className="h-24 w-24 shrink-0 overflow-hidden rounded-md border bg-gray-50">
         {product.thumbnailUrl ? (
           <img src={product.thumbnailUrl} alt={product.name} className="h-full w-full object-cover" />

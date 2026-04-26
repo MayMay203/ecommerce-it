@@ -10,6 +10,7 @@ import type { CartItem } from '../types/cart.types';
 export function CartDrawer() {
   const isOpen = useCartStore((s) => s.isCartOpen);
   const closeCart = useCartStore((s) => s.closeCart);
+  const { selectedItems, toggleItemSelection, selectAllItems, clearSelection } = useCartStore();
   const { data: cart, isLoading } = useCart();
 
   useEffect(() => {
@@ -20,7 +21,15 @@ export function CartDrawer() {
   }, [isOpen, closeCart]);
 
   const items = cart?.items ?? [];
-  const subtotal = items.reduce(
+
+  useEffect(() => {
+    if (items.length > 0 && selectedItems.size === 0) {
+      selectAllItems(items.map((item) => item.id));
+    }
+  }, [items.length]);
+
+  const selectedItemsList = items.filter((item) => selectedItems.has(item.id));
+  const subtotal = selectedItemsList.reduce(
     (sum, item) => sum + Number(item.variant.price) * item.quantity,
     0,
   );
@@ -58,13 +67,13 @@ export function CartDrawer() {
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-4 py-3">
+        <div className="flex-1 overflow-y-auto">
           {isLoading ? (
             <div className="flex h-full items-center justify-center">
               <div className="h-8 w-8 animate-spin rounded-full border-2 border-amber-400 border-t-transparent" />
             </div>
           ) : items.length === 0 ? (
-            <div className="flex h-full flex-col items-center justify-center gap-3 text-slate-500">
+            <div className="flex h-full flex-col items-center justify-center gap-3 px-4 py-3 text-slate-500">
               <svg className="h-16 w-16 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
                   d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -75,26 +84,58 @@ export function CartDrawer() {
               </button>
             </div>
           ) : (
-            <ul className="divide-y">
-              {items.map((item) => (
-                <CartItemRow key={item.id} item={item} />
-              ))}
-            </ul>
+            <>
+              <div className="border-b bg-slate-50 px-4 py-2 flex items-center gap-2 sticky top-0">
+                <input
+                  type="checkbox"
+                  checked={selectedItems.size > 0 && selectedItems.size === items.length}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      selectAllItems(items.map((item) => item.id));
+                    } else {
+                      clearSelection();
+                    }
+                  }}
+                  className="h-4 w-4 rounded border-slate-300 text-amber-400 cursor-pointer"
+                />
+                <span className="text-xs font-medium text-slate-600">
+                  {selectedItems.size > 0 ? `${selectedItems.size} selected` : 'Select all'}
+                </span>
+              </div>
+              <ul className="divide-y px-4">
+                {items.map((item) => (
+                  <CartItemRow
+                    key={item.id}
+                    item={item}
+                    isSelected={selectedItems.has(item.id)}
+                    onToggleSelect={() => toggleItemSelection(item.id)}
+                  />
+                ))}
+              </ul>
+            </>
           )}
         </div>
 
         {items.length > 0 && (
           <div className="border-t bg-white px-4 py-4">
+            <div className="mb-2 text-xs text-slate-500">
+              {selectedItemsList.length > 0 ? (
+                <p>{selectedItemsList.length} item{selectedItemsList.length !== 1 ? 's' : ''} selected</p>
+              ) : (
+                <p className="text-red-500 font-medium">No items selected</p>
+              )}
+            </div>
             <div className="mb-3 flex justify-between text-sm font-medium text-slate-700">
               <span>Subtotal</span>
               <span>${subtotal.toFixed(2)}</span>
             </div>
             <Link
-              to={ROUTES.CHECKOUT}
+              to={ROUTES.CART}
               onClick={closeCart}
-              className="block w-full rounded-lg bg-amber-400 py-2.5 text-center text-sm font-semibold text-slate-900 hover:bg-amber-500"
+              disabled={selectedItemsList.length === 0}
+              className="block w-full rounded-lg bg-amber-400 py-2.5 text-center text-sm font-semibold text-slate-900 hover:bg-amber-500 disabled:bg-slate-300 disabled:cursor-not-allowed"
             >
-              Proceed to Checkout
+              View Cart & Checkout
             </Link>
             <button
               onClick={closeCart}
@@ -111,9 +152,11 @@ export function CartDrawer() {
 
 interface CartItemRowProps {
   item: CartItem;
+  isSelected: boolean;
+  onToggleSelect: () => void;
 }
 
-function CartItemRow({ item }: CartItemRowProps) {
+function CartItemRow({ item, isSelected, onToggleSelect }: CartItemRowProps) {
   const { mutate: removeItem, isPending: isRemoving } = useRemoveCartItem();
   const { mutate: updateItem, isPending: isUpdating } = useUpdateCartItem();
   const isPending = isRemoving || isUpdating;
@@ -122,7 +165,13 @@ function CartItemRow({ item }: CartItemRowProps) {
   const { product } = variant;
 
   return (
-    <li className="flex gap-3 py-4">
+    <li className="flex gap-3 py-4 hover:bg-slate-50 transition-colors">
+      <input
+        type="checkbox"
+        checked={isSelected}
+        onChange={onToggleSelect}
+        className="h-4 w-4 rounded border-slate-300 text-amber-400 cursor-pointer mt-1 shrink-0"
+      />
       <div className="h-20 w-20 shrink-0 overflow-hidden rounded-md border bg-slate-50">
         {product.thumbnailUrl ? (
           <img src={product.thumbnailUrl} alt={product.name} className="h-full w-full object-cover" />
