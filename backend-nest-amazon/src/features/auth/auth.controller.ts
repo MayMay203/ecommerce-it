@@ -121,16 +121,36 @@ export class AuthController {
   @Get('me')
   @ApiOperation({ summary: 'Get current user profile' })
   async getMe(@CurrentUser() user: IUserPayload) {
-    const data = await this.authService.getMe(user.sub);
-    return { data, message: 'Profile retrieved successfully' };
+    const userData = await this.authService.getMe(user.sub);
+    return {
+      data: {
+        id: userData.id,
+        email: userData.email,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        phone: userData.phone,
+        role: userData.role?.name ?? 'customer',
+      },
+      message: 'Profile retrieved successfully',
+    };
   }
 
   @UseGuards(JwtAuthGuard)
   @Patch('me')
   @ApiOperation({ summary: 'Update current user profile' })
   async updateMe(@CurrentUser() user: IUserPayload, @Body() dto: UpdateMeDto) {
-    const data = await this.authService.updateMe(user.sub, dto);
-    return { data, message: 'Profile updated successfully' };
+    const userData = await this.authService.updateMe(user.sub, dto);
+    return {
+      data: {
+        id: userData.id,
+        email: userData.email,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        phone: userData.phone,
+        role: userData.role?.name ?? 'customer',
+      },
+      message: 'Profile updated successfully',
+    };
   }
 
   @UseGuards(JwtAuthGuard)

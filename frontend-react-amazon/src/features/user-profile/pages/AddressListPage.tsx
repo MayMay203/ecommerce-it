@@ -4,6 +4,7 @@ import { useCreateAddress } from '../hooks/useCreateAddress';
 import { useUpdateAddress } from '../hooks/useUpdateAddress';
 import { useDeleteAddress } from '../hooks/useDeleteAddress';
 import { useSetDefaultAddress } from '../hooks/useSetDefaultAddress';
+import { ConfirmModal } from '@/shared/components/ui/ConfirmModal';
 import { AddressList } from '../components/AddressList';
 import { AddressForm } from '../components/AddressForm';
 import type { Address, CreateAddressRequest } from '../types/address.types';
@@ -11,6 +12,7 @@ import type { Address, CreateAddressRequest } from '../types/address.types';
 export default function AddressListPage() {
   const [showForm, setShowForm] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
 
   const { data: addresses = [], isLoading: isLoadingAddresses } = useAddresses();
   const { mutate: createAddress, isPending: isCreating } = useCreateAddress();
@@ -45,9 +47,18 @@ export default function AddressListPage() {
   };
 
   const handleDelete = (id: number) => {
-    if (confirm('Are you sure you want to delete this address?')) {
-      deleteAddress(id);
+    setDeleteConfirmId(id);
+  };
+
+  const handleConfirmDelete = () => {
+    if (deleteConfirmId !== null) {
+      deleteAddress(deleteConfirmId);
+      setDeleteConfirmId(null);
     }
+  };
+
+  const handleCancelDelete = () => {
+    setDeleteConfirmId(null);
   };
 
   const handleSetDefault = (id: number) => {
@@ -116,6 +127,18 @@ export default function AddressListPage() {
           )}
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirmId !== null && (
+        <ConfirmModal
+          title="Delete Address"
+          message="Are you sure you want to delete this address? This action cannot be undone."
+          confirmLabel="Delete"
+          cancelLabel="Cancel"
+          onConfirm={handleConfirmDelete}
+          onCancel={handleCancelDelete}
+        />
+      )}
     </div>
   );
 }
